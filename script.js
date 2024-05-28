@@ -3,17 +3,9 @@ const Gameboard = (function (){
     const rows = 3; 
     const columns = 3;
 
-    // For loop to insert a Cell object in each cell/square
-    for (let i = 0; i < rows; i++) {
-        board[i] = [];
-        for (let j = 0; j < columns; j++) {
-          board[i].push(createCell());
-        }
-      };
-
     //Cells factory function
     const createCell = () => {
-        mark = "";
+        let mark = "";
         const addMark = (playerMark) => {
             mark = playerMark;
         }
@@ -24,7 +16,15 @@ const Gameboard = (function (){
             getMark
         };
     };
-    
+
+    // For loop to insert a Cell object in each cell/square
+    for (let i = 0; i < rows; i++) {
+        board[i] = [];
+        for (let j = 0; j < columns; j++) {
+          board[i].push(createCell());
+        }
+      };
+
     // Marks the cell with X or O
     const mark = (column, row, playerMark) => {
         board[row][column].addMark(playerMark);
@@ -48,24 +48,31 @@ const Gameboard = (function (){
 })();
 
 // Creates two players objects
-const Player = (firstPlayerName, secondPlayerName) => {
-    const players = [
+const Player = (function() {
+
+    const addNames = (player1, player2) => {
+        playersArray[0].name = player1;
+        playersArray[1].name = player2;
+    }
+    const playersArray = [
         {
-            name: firstPlayerName,
+            name: "",
             mark: "X"
         },
         {
-            name: secondPlayerName,
+            name: "",
             mark: "O"
         }
     ];
 
-    return players;
-};
+    const getPlayers = () => playersArray;
+
+    return {getPlayers, addNames};
+})();
 
 
 const GameFlow = () => {
-    const players = Player();
+    let players = Player.getPlayers();
     let activePlayer = players[0];
 
     // switches the active player when called
@@ -78,17 +85,16 @@ const GameFlow = () => {
 
     // controls each round
     const playRound = (column, row) => {
-        activePlayerMark = getActivePlayer.mark;
-
-        Gameboard.mark(column, row, activePlayerMark);
+        Gameboard.mark(column, row, getActivePlayer().mark);
 
         switchActivePlayer();
         logRound();
     };
 
+    // logs the curren player's name to the console
     const logRound = () => {
         Gameboard.logBoard();
-        console.log(`${getActivePlayer.name}'s turn to play.`)
+        console.log(`${getActivePlayer().name}'s turn to play.`);
     }
 
     logRound();
