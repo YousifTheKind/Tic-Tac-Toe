@@ -82,22 +82,71 @@ const GameFlow = () => {
 
     // returns the current active player
     const getActivePlayer = () => activePlayer;
-
     // controls each round
     const playRound = (column, row) => {
         Gameboard.mark(column, row, getActivePlayer().mark);
 
+        winnerChecker();
         switchActivePlayer();
         logRound();
+
     };
+    
+    const winnerChecker = () => {
+        //check for a winner every round
+        let gameOver = false;
+        board = Gameboard.getBoard();
+        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
+        
+        // checking every row
+        for (let i = 0; i < board.length; i++) {
+            // checks if all elements in a row are equal
+            if(boardWithCellValues[i].every(mark => mark === boardWithCellValues[i][0])) {
+                // makes sure it's not an empty string because init value is ""
+                if(boardWithCellValues[i][0] != "") {
+                    gameOver = true;
+                }
+            };
+        };
+    
+        for (let i = 0; i < board.length; i++) {
+            const col = boardWithCellValues.map(cell => cell[i]);
+            if(col.every(mark => mark === boardWithCellValues[i][0]))
+                if(boardWithCellValues[i][0] != "") {
+                    gameOver = true;
+                }
+
+        }
+        console.log(gameOver)
+        // return gameOver;
+    }
+
 
     // logs the curren player's name to the console
     const logRound = () => {
         Gameboard.logBoard();
-        console.log(`${getActivePlayer().name}'s turn to play.`);
+        // console.log(`${getActivePlayer().name}'s turn to play.`);
     }
 
     logRound();
+
+    //delete later
+    // check for column win
+    // playRound(0, 0);
+    // playRound(1, 1);
+    // playRound(0, 1);
+    // playRound(2, 2);
+    // playRound(0, 2);
+    // check for row win
+    // game.playRound(0, 0);
+    // game.playRound(0, 1);
+    // game.playRound(1, 0);
+    // game.playRound(1, 1);
+    // game.playRound(2, 0);
+    // game.playRound(2, 1);
+
+
+
 
     return {
         playRound,
