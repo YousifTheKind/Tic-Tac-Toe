@@ -82,16 +82,20 @@ const GameFlow = () => {
 
     // returns the current active player
     const getActivePlayer = () => activePlayer;
+
     // controls each round
     const playRound = (column, row) => {
-        Gameboard.mark(column, row, getActivePlayer().mark);
-
-        winnerChecker();
-        switchActivePlayer();
         logRound();
 
+        if(winnerChecker()) {
+            console.log(`"Congrats!" ${getActivePlayer().name}`)
+            return;
+        }
+
+        Gameboard.mark(column, row, getActivePlayer().mark);
+        switchActivePlayer();
     };
-    
+
     const winnerChecker = () => {
         //check for a winner every round
         let gameOver = false;
@@ -117,15 +121,15 @@ const GameFlow = () => {
                 }
 
         }
-        console.log(gameOver)
-        // return gameOver;
+
+        return gameOver;
     }
 
 
     // logs the curren player's name to the console
     const logRound = () => {
         Gameboard.logBoard();
-        // console.log(`${getActivePlayer().name}'s turn to play.`);
+        console.log(`${getActivePlayer().name}'s turn to play.`);
     }
 
     logRound();
