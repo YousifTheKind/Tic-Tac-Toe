@@ -88,6 +88,7 @@ const GameFlow = () => {
         logRound();
 
         if(winnerChecker()) {
+            switchActivePlayer();
             console.log(`"Congrats!" ${getActivePlayer().name}`)
             return;
         }
@@ -129,18 +130,18 @@ const GameFlow = () => {
     // logs the curren player's name to the console
     const logRound = () => {
         Gameboard.logBoard();
-        console.log(`${getActivePlayer().name}'s turn to play.`);
+        console.log(`${getActivePlayer().name}'s turn to play. Your mark is ${getActivePlayer().mark}`);
     }
 
     logRound();
 
     //delete later
     // check for column win
-    // playRound(0, 0);
-    // playRound(1, 1);
-    // playRound(0, 1);
-    // playRound(2, 2);
-    // playRound(0, 2);
+    // game.playRound(0, 0);
+    // game.playRound(1, 1);
+    // game.playRound(0, 1);
+    // game.playRound(2, 2);
+    // game.playRound(0, 2);
     // check for row win
     // game.playRound(0, 0);
     // game.playRound(0, 1);
