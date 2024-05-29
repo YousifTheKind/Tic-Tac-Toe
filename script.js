@@ -8,7 +8,7 @@ const Gameboard = (function (){
         let mark = "";
         const addMark = (playerMark) => {
             mark = playerMark;
-        }
+        };
         const getMark = () => mark;
 
         return {
@@ -17,13 +17,15 @@ const Gameboard = (function (){
         };
     };
 
+    const newBoard = () => {
     // For loop to insert a Cell object in each cell/square
-    for (let i = 0; i < rows; i++) {
-        board[i] = [];
-        for (let j = 0; j < columns; j++) {
-          board[i].push(createCell());
-        }
-      };
+        for (let i = 0; i < rows; i++) {
+            board[i] = [];
+            for (let j = 0; j < columns; j++) {
+            board[i].push(createCell());
+            };
+        };
+    };
 
     // Marks the cell with X or O
     const mark = (column, row, playerMark) => {
@@ -39,10 +41,13 @@ const Gameboard = (function (){
         console.log(boardWithCellValues);
     };
 
+    newBoard();
+
     return {
         getBoard,
         mark,
-        logBoard
+        logBoard,
+        newBoard
     };
 
 })();
@@ -75,6 +80,10 @@ const GameFlow = () => {
     let players = Player.getPlayers();
     let activePlayer = players[0];
 
+    // board is an array of objects
+    board = Gameboard.getBoard();
+
+
     // switches the active player when called
     const switchActivePlayer= () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -85,76 +94,113 @@ const GameFlow = () => {
 
     // controls each round
     const playRound = (column, row) => {
-        logRound();
-
-        if(winnerChecker()) {
-            switchActivePlayer();
-            console.log(`"Congrats!" ${getActivePlayer().name}`)
-            return;
-        }
-
         Gameboard.mark(column, row, getActivePlayer().mark);
         switchActivePlayer();
+        logRound();
+
+        const Winner = checkWinner();
+        const Tie = checkTie();
+
+        if(Winner) {
+            switchActivePlayer();
+            console.log(`Congrats! ${getActivePlayer().name}.`,'\n',"Resetting Board...");
+            Gameboard.newBoard();
+        }
+        else if(Tie) {
+            console.log("IT'S A TIE!")
+        };
     };
 
-    const winnerChecker = () => {
+    const checkTie = () => {
+        //checks for ties
+        // boardWithCellValues is an array of "marks" either x or o
+        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
+
+        if(boardWithCellValues.every(row => row.every(cell => cell !== ""))){
+            return true
+        }; 
+    };
+
+    const checkWinner = () => {
         //check for a winner every round
         let gameOver = false;
-        board = Gameboard.getBoard();
+
+        // boardWithCellValues is an array of "marks" either x or o
         const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
-        
+
         // checking every row
-        for (let i = 0; i < board.length; i++) {
-            // checks if all elements in a row are equal
-            if(boardWithCellValues[i].every(mark => mark === boardWithCellValues[i][0])) {
-                // makes sure it's not an empty string because init value is ""
-                if(boardWithCellValues[i][0] != "") {
-                    gameOver = true;
-                }
+        const checkHorizontal = () => {
+            for (let i = 0; i < board.length; i++) {
+                // checks if all elements in a row are equal
+                if(boardWithCellValues[i].every(mark => mark === boardWithCellValues[i][0])) {
+                    // makes sure doesn't inclued empty strings
+                    if(!boardWithCellValues[i].includes("")) {
+                        return true;
+                    };
+                };
             };
         };
-    
-        for (let i = 0; i < board.length; i++) {
-            const col = boardWithCellValues.map(cell => cell[i]);
-            if(col.every(mark => mark === boardWithCellValues[i][0]))
-                if(boardWithCellValues[i][0] != "") {
-                    gameOver = true;
-                }
 
+        // checking every column
+        const checkVerticle = () => {
+            for (let i = 0; i < board.length; i++) {
+                //grab a column using map()
+                const col = boardWithCellValues.map(row => row[i]);
+                // check if all values in col are equal
+                if(col.every(mark => mark === boardWithCellValues[i][0]))
+                    // makes sure doesn't inclued empty strings
+                    if(!col.includes("")) {
+                        return true;
+                    };
+            };
+        };
+
+        const checkDiagonal = () => {
+            // functions that get the diagonal values in an array
+            const getDiagonal_1 = array => array.map((row, index) => row[index]);
+            const getDiagonal_2 = array => array.map((row, index) => row[row.length-index-1]);
+
+            // storing diagonal values
+            const diagonalCells_1 = getDiagonal_1(boardWithCellValues);
+            const diagonalCells_2 = getDiagonal_2(boardWithCellValues);
+
+            // if array doesn't inclued empty strings because that's the default value then check if all values match then change gameOver to true
+            if( !diagonalCells_1.includes("")){
+                if(diagonalCells_1.every(mark => mark === diagonalCells_1[0])) {
+                    return true;
+                };
+            };
+            if( !diagonalCells_2.includes("")){
+                if(diagonalCells_2.every(mark => mark === diagonalCells_2[0])) {
+                    return true;
+                };
+            };
+        };
+
+        if(gameOver = checkVerticle()) {
+            return gameOver;
         }
+        if(gameOver = checkHorizontal()) {
+            return gameOver;
+        }
+        if(gameOver = checkDiagonal()) {
+            return gameOver;
+        };
+    };
 
-        return gameOver;
-    }
-
+    const getResetGame = () => resetGame;
 
     // logs the curren player's name to the console
     const logRound = () => {
         Gameboard.logBoard();
         console.log(`${getActivePlayer().name}'s turn to play. Your mark is ${getActivePlayer().mark}`);
-    }
+    };
 
     logRound();
 
-    //delete later
-    // check for column win
-    // game.playRound(0, 0);
-    // game.playRound(1, 1);
-    // game.playRound(0, 1);
-    // game.playRound(2, 2);
-    // game.playRound(0, 2);
-    // check for row win
-    // game.playRound(0, 0);
-    // game.playRound(0, 1);
-    // game.playRound(1, 0);
-    // game.playRound(1, 1);
-    // game.playRound(2, 0);
-    // game.playRound(2, 1);
-
-
-
-
     return {
         playRound,
-        getActivePlayer
+        getActivePlayer,
+        getResetGame
     };
-}
+};
