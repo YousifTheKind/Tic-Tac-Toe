@@ -81,7 +81,6 @@ const Player = (function() {
     return {getPlayers, addNames};
 })();
 
-
 const GameFlow = () => {
     let players = Player.getPlayers();
     let activePlayer = players[0];
@@ -110,11 +109,12 @@ const GameFlow = () => {
 
         if(Winner) {
             switchActivePlayer();
-            console.log(`Congrats! ${getActivePlayer().name}.`,'\n',"Resetting Board...");
+            console.log(`Congrats! ${getActivePlayer().name}. \nResetting Board...`);
             Gameboard.newBoard();
         }
         else if(Tie) {
-            console.log("IT'S A TIE!")
+            console.log("IT'S A TIE! \nResetting board...")
+            Gameboard.newBoard();
         };
     };
 
