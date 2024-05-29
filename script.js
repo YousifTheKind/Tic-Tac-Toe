@@ -29,7 +29,13 @@ const Gameboard = (function (){
 
     // Marks the cell with X or O
     const mark = (column, row, playerMark) => {
-        board[row][column].addMark(playerMark);
+        // check if other player already choose this cell
+        if(board[row][column].getMark() !== ""){
+            console.log("Nice try!")
+        }
+        else {
+            board[row][column].addMark(playerMark);
+        };
     };
 
     // a method that returns the board to make it a private variable 
@@ -94,6 +100,7 @@ const GameFlow = () => {
 
     // controls each round
     const playRound = (column, row) => {
+
         Gameboard.mark(column, row, getActivePlayer().mark);
         switchActivePlayer();
         logRound();
@@ -112,7 +119,6 @@ const GameFlow = () => {
     };
 
     const checkTie = () => {
-        //checks for ties
         // boardWithCellValues is an array of "marks" either x or o
         const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
 
@@ -188,7 +194,6 @@ const GameFlow = () => {
         };
     };
 
-    const getResetGame = () => resetGame;
 
     // logs the curren player's name to the console
     const logRound = () => {
@@ -201,6 +206,5 @@ const GameFlow = () => {
     return {
         playRound,
         getActivePlayer,
-        getResetGame
     };
 };
