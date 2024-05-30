@@ -9,8 +9,25 @@
 </head>
 <body>
     <div class="container">
-        <div class="turn"></div>
-        <div class="board"></div>
+        <div id="winMessage">
+            You won
+        </div>
+        <form action="">
+            <label for="playerOneName">First Player's Name:</label>
+            <input type="text" id="playerOneName" required>
+            <label for="playerTwoName">Second Player's Name:</label>
+            <input type="text" id="playerTwoName" required>
+            <span id="message"></span>
+            <div class="buttonPos">
+                <button class="startBtn">Start</button>
+                <button class="restartBtn">Restart</button>
+            </div>
+        </form>
+
+        <div id="hideBoard">
+            <div class="turn"></div>
+            <div class="board"></div>
+        </div>
     </div>
 </body>
 </html>

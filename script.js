@@ -29,13 +29,7 @@ const Gameboard = (function (){
 
     // Marks the cell with X or O
     const mark = (column, row, playerMark) => {
-        // check if other player already choose this cell
-        if(board[row][column].getMark() !== ""){
-            console.log("Nice try!")
-        }
-        else {
             board[row][column].addMark(playerMark);
-        };
     };
 
     // a method that returns the board to make it a private variable 
@@ -101,6 +95,11 @@ const GameFlowController = () => {
 
     // controls each round
     const playRound = (column, row) => {
+        // check if other player already choose this cell
+        if(board[row][column].getMark() !== ""){
+            console.log("Nice try!");
+            return;
+        };
 
         Gameboard.mark(column, row, getActivePlayer().mark);
         switchActivePlayer();
@@ -112,10 +111,12 @@ const GameFlowController = () => {
         if(Winner) {
             switchActivePlayer();
             console.log(`Congrats! ${getActivePlayer().name}. \nResetting Board...`);
+            displayController.winMessage();
             Gameboard.newBoard();
         }
         else if(Tie) {
             console.log("IT'S A TIE! \nResetting board...")
+            displayController.tieMessage();
             Gameboard.newBoard();
         };
     };
@@ -214,6 +215,16 @@ const displayController = (function () {
     const game = GameFlowController();
     const turnDiv = document.querySelector(".turn");
     const boardDiv = document.querySelector(".board");
+    const startBtn = document.querySelector(".startBtn");
+    const restartBtn = document.querySelector(".restartBtn");
+    const form = document.querySelector("form");
+    const hideBoard = document.getElementById("hideBoard");
+    hideBoard.style.display="none";
+    const errorMessage = document.getElementById("message");
+    const resultDiv = document.getElementById("winMessage");
+    resultDiv.style.display="none";
+
+    let gameStarted = false;
 
     const updateDisplay = () => {
         //clear display
@@ -244,8 +255,6 @@ const displayController = (function () {
         // make sure player didn't click on the gaps
         if(!selectedColumn || !selectedRow) return;
 
-        console.log("column: " + selectedColumn + "\n" + "Row:" + selectedRow)
-
         game.playRound(selectedColumn, selectedRow);
         updateDisplay();
     };
@@ -254,4 +263,54 @@ const displayController = (function () {
 
    //initial render
    updateDisplay();
+
+   const startBtnClickListener = (e) => {
+    e.preventDefault();
+
+    const playerOne = document.getElementById("playerOneName").value;
+    const playerTwo = document.getElementById("playerTwoName").value;
+
+    if(!playerOne || !playerTwo) {
+        errorMessage.textContent = "Please Enter Both Names"
+        console.log("please enter name")
+        return;
+    };
+
+    errorMessage.textContent = ""
+    Player.addNames(playerOne, playerTwo);
+    hideBoard.style.display="inherit"
+    updateDisplay();
+    form.reset();
+    gameStarted = true;
+   };
+
+   const restartBtnClickListener = (e) => {
+    e.preventDefault();
+    if(!gameStarted) {
+        errorMessage.textContent = "Please Enter Both Names Then Click Start"
+        return;
+    };
+    console.log("balls")
+    Gameboard.newBoard();
+    hideBoard.style.display = "inherit";
+    resultDiv.style.display="none"
+   };
+
+   startBtn.addEventListener("click", startBtnClickListener);
+   restartBtn.addEventListener("click", restartBtnClickListener);
+
+   const winMessage = () => {
+    const activePlayer = game.getActivePlayer();
+    resultDiv.style.display="block"
+    resultDiv.textContent = `${activePlayer.name} Won! Click Restart To Play Again.`
+    hideBoard.style.display = "none";
+   };
+
+   const tieMessage = () => {
+    resultDiv.style.display="block"
+    resultDiv.textContent = `DRAW \nClick Restart To Play Again!`
+    hideBoard.style.display = "none";
+   };
+
+   return {winMessage, tieMessage}
 })();
