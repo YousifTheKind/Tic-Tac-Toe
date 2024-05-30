@@ -203,7 +203,6 @@ const displayController = (function () {
     const errorMessage = document.getElementById("message");
     const resultDiv = document.getElementById("winMessage");
     resultDiv.style.display="none";
-
     let gameStarted = false;
 
     const updateDisplay = () => {
@@ -239,43 +238,35 @@ const displayController = (function () {
         updateDisplay();
     };
 
-    boardDiv.addEventListener("click", boardClickListener)
-
-   //initial render
-   updateDisplay();
-
    const startBtnClickListener = (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const playerOne = document.getElementById("playerOneName").value;
-    const playerTwo = document.getElementById("playerTwoName").value;
+        const playerOne = document.getElementById("playerOneName").value;
+        const playerTwo = document.getElementById("playerTwoName").value;
 
-    if(!playerOne || !playerTwo) {
-        errorMessage.textContent = "Please Enter Both Names"
-        return;
-    };
+        if(!playerOne || !playerTwo) {
+            errorMessage.textContent = "Please Enter Both Names"
+            return;
+        };
 
-    errorMessage.textContent = ""
-    Player.addNames(playerOne, playerTwo);
-    hideBoard.style.display="inherit"
-    updateDisplay();
-    form.reset();
-    gameStarted = true;
+        errorMessage.textContent = ""
+        Player.addNames(playerOne, playerTwo);
+        hideBoard.style.display="inherit"
+        updateDisplay();
+        form.reset();
+        gameStarted = true;
    };
 
    const restartBtnClickListener = (e) => {
-    e.preventDefault();
-    if(!gameStarted) {
-        errorMessage.textContent = "Please Enter Both Names Then Click Start"
-        return;
-    };
-    Gameboard.newBoard();
-    hideBoard.style.display = "inherit";
-    resultDiv.style.display="none"
+        e.preventDefault();
+        if(!gameStarted) {
+            errorMessage.textContent = "Please Enter Both Names Then Click Start"
+            return;
+        };
+        Gameboard.newBoard();
+        hideBoard.style.display = "inherit";
+        resultDiv.style.display="none"
    };
-
-   startBtn.addEventListener("click", startBtnClickListener);
-   restartBtn.addEventListener("click", restartBtnClickListener);
 
    const winMessage = () => {
     const activePlayer = game.getActivePlayer();
@@ -289,6 +280,13 @@ const displayController = (function () {
     resultDiv.textContent = `DRAW \nClick Restart To Play Again!`
     hideBoard.style.display = "none";
    };
+   
+   //initial render
+   updateDisplay();
+
+   boardDiv.addEventListener("click", boardClickListener);
+   startBtn.addEventListener("click", startBtnClickListener);
+   restartBtn.addEventListener("click", restartBtnClickListener);
 
    return {winMessage, tieMessage}
 })();
