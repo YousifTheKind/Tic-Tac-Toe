@@ -41,10 +41,10 @@ const Gameboard = (function (){
     // a method that returns the board to make it a private variable 
     const getBoard = () => board;
 
-    // log board's values
+    // log board's Marks
     const logBoard = () => {
-        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
-        console.log(boardWithCellValues);
+        const boardWithCellMarks = board.map((row) => row.map((cell) => cell.getMark()));
+        console.log(boardWithCellMarks);
     };
 
     newBoard();
@@ -81,13 +81,15 @@ const Player = (function() {
     return {getPlayers, addNames};
 })();
 
-const GameFlow = () => {
+const GameFlowController = () => {
     let players = Player.getPlayers();
     let activePlayer = players[0];
 
     // board is an array of objects
     board = Gameboard.getBoard();
 
+    // a function that returns the latest board to be used in displayController
+    const getBoard = () => board;
 
     // switches the active player when called
     const switchActivePlayer= () => {
@@ -119,10 +121,10 @@ const GameFlow = () => {
     };
 
     const checkTie = () => {
-        // boardWithCellValues is an array of "marks" either x or o
-        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
+        // boardWithCellMarks is an array of "marks" either x or o
+        const boardWithCellMarks = board.map((row) => row.map((cell) => cell.getMark()));
 
-        if(boardWithCellValues.every(row => row.every(cell => cell !== ""))){
+        if(boardWithCellMarks.every(row => row.every(cell => cell !== ""))){
             return true
         }; 
     };
@@ -131,16 +133,16 @@ const GameFlow = () => {
         //check for a winner every round
         let gameOver = false;
 
-        // boardWithCellValues is an array of "marks" either x or o
-        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getMark()));
+        // boardWithCellMarks is an array of "marks" either x or o
+        const boardWithCellMarks = board.map((row) => row.map((cell) => cell.getMark()));
 
         // checking every row
         const checkHorizontal = () => {
             for (let i = 0; i < board.length; i++) {
                 // checks if all elements in a row are equal
-                if(boardWithCellValues[i].every(mark => mark === boardWithCellValues[i][0])) {
+                if(boardWithCellMarks[i].every(mark => mark === boardWithCellMarks[i][0])) {
                     // makes sure doesn't inclued empty strings
-                    if(!boardWithCellValues[i].includes("")) {
+                    if(!boardWithCellMarks[i].includes("")) {
                         return true;
                     };
                 };
@@ -151,26 +153,24 @@ const GameFlow = () => {
         const checkVerticle = () => {
             for (let i = 0; i < board.length; i++) {
                 //grab a column using map()
-                const col = boardWithCellValues.map(row => row[i]);
-                // check if all values in col are equal
-                if(col.every(mark => mark === boardWithCellValues[i][0]))
-                    // makes sure doesn't inclued empty strings
-                    if(!col.includes("")) {
+                const col = boardWithCellMarks.map(row => row[i]);
+                // check if all Marks in col are equal & makes sure doesn't inclued empty strings
+                if(col.every(mark => mark === col[0] && !col.includes(""))){
                         return true;
-                    };
+                };
             };
         };
 
         const checkDiagonal = () => {
-            // functions that get the diagonal values in an array
+            // functions that get the diagonal Marks in an array
             const getDiagonal_1 = array => array.map((row, index) => row[index]);
             const getDiagonal_2 = array => array.map((row, index) => row[row.length-index-1]);
 
-            // storing diagonal values
-            const diagonalCells_1 = getDiagonal_1(boardWithCellValues);
-            const diagonalCells_2 = getDiagonal_2(boardWithCellValues);
+            // storing diagonal Marks
+            const diagonalCells_1 = getDiagonal_1(boardWithCellMarks);
+            const diagonalCells_2 = getDiagonal_2(boardWithCellMarks);
 
-            // if array doesn't inclued empty strings because that's the default value then check if all values match then change gameOver to true
+            // if array doesn't inclued empty strings because that's the default value then check if all Marks match then change gameOver to true
             if( !diagonalCells_1.includes("")){
                 if(diagonalCells_1.every(mark => mark === diagonalCells_1[0])) {
                     return true;
@@ -185,10 +185,10 @@ const GameFlow = () => {
 
         if(gameOver = checkVerticle()) {
             return gameOver;
-        }
+        };
         if(gameOver = checkHorizontal()) {
             return gameOver;
-        }
+        };
         if(gameOver = checkDiagonal()) {
             return gameOver;
         };
@@ -206,5 +206,52 @@ const GameFlow = () => {
     return {
         playRound,
         getActivePlayer,
+        getBoard
     };
 };
+
+const displayController = (function () {
+    const game = GameFlowController();
+    const turnDiv = document.querySelector(".turn");
+    const boardDiv = document.querySelector(".board");
+
+    const updateDisplay = () => {
+        //clear display
+        boardDiv.textContent = "";
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        turnDiv.textContent = `${activePlayer.name}'s turn to play. Your mark is ${activePlayer.mark}`;
+
+        // render board array
+        board.forEach((row,index) => {
+            let rowIndex = index;
+            row.forEach((cell, index) => {
+                const cellButton = document.createElement("button");
+                cellButton.classList.add("cell");
+                cellButton.dataset.column = index;
+                cellButton.dataset.row = rowIndex;
+                cellButton.textContent = cell.getMark();
+                boardDiv.appendChild(cellButton);
+            });
+          });
+    };
+
+    const boardClickListener = (e) => {
+        const selectedRow = e.target.dataset.row;
+        const selectedColumn = e.target.dataset.column;
+
+        // make sure player didn't click on the gaps
+        if(!selectedColumn || !selectedRow) return;
+
+        console.log("column: " + selectedColumn + "\n" + "Row:" + selectedRow)
+
+        game.playRound(selectedColumn, selectedRow);
+        updateDisplay();
+    };
+
+    boardDiv.addEventListener("click", boardClickListener)
+
+   //initial render
+   updateDisplay();
+})();
