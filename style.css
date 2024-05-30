@@ -1,3 +1,7 @@
+body {
+  background-color: #a8c1af;
+}
+
 .container,
 #hideBoard {
   display: flex;
