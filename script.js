@@ -35,18 +35,11 @@ const Gameboard = (function (){
     // a method that returns the board to make it a private variable 
     const getBoard = () => board;
 
-    // log board's Marks
-    const logBoard = () => {
-        const boardWithCellMarks = board.map((row) => row.map((cell) => cell.getMark()));
-        console.log(boardWithCellMarks);
-    };
-
     newBoard();
 
     return {
         getBoard,
         mark,
-        logBoard,
         newBoard
     };
 
@@ -97,25 +90,21 @@ const GameFlowController = () => {
     const playRound = (column, row) => {
         // check if other player already choose this cell
         if(board[row][column].getMark() !== ""){
-            console.log("Nice try!");
             return;
         };
 
         Gameboard.mark(column, row, getActivePlayer().mark);
         switchActivePlayer();
-        logRound();
 
         const Winner = checkWinner();
         const Tie = checkTie();
 
         if(Winner) {
             switchActivePlayer();
-            console.log(`Congrats! ${getActivePlayer().name}. \nResetting Board...`);
             displayController.winMessage();
             Gameboard.newBoard();
         }
         else if(Tie) {
-            console.log("IT'S A TIE! \nResetting board...")
             displayController.tieMessage();
             Gameboard.newBoard();
         };
@@ -195,15 +184,6 @@ const GameFlowController = () => {
         };
     };
 
-
-    // logs the curren player's name to the console
-    const logRound = () => {
-        Gameboard.logBoard();
-        console.log(`${getActivePlayer().name}'s turn to play. Your mark is ${getActivePlayer().mark}`);
-    };
-
-    logRound();
-
     return {
         playRound,
         getActivePlayer,
@@ -272,7 +252,6 @@ const displayController = (function () {
 
     if(!playerOne || !playerTwo) {
         errorMessage.textContent = "Please Enter Both Names"
-        console.log("please enter name")
         return;
     };
 
@@ -290,7 +269,6 @@ const displayController = (function () {
         errorMessage.textContent = "Please Enter Both Names Then Click Start"
         return;
     };
-    console.log("balls")
     Gameboard.newBoard();
     hideBoard.style.display = "inherit";
     resultDiv.style.display="none"
